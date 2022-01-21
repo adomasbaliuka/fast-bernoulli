@@ -40,7 +40,7 @@ public:
     virtual ~IExecutor() = default;
     virtual void Execute(const void *src, void *dst, size_t noblocks) = 0;
 
-    TExecutionPlan const &Plan() const noexcept {
+    [[nodiscard]] TExecutionPlan const &Plan() const noexcept {
         return Plan_;
     }
 
@@ -54,8 +54,8 @@ public:
         : IExecutor(plan)
     {}
 
-    virtual ~TGeneralExecutor() = default;
-    virtual void Execute(const void *src, void *dst, size_t noblocks) override;
+    ~TGeneralExecutor() override = default;
+    void Execute(const void *src, void *dst, size_t noblocks) override;
 };
 
 class TAvxExecutor : public IExecutor {
@@ -64,13 +64,13 @@ public:
         : IExecutor(plan)
     {}
 
-    virtual ~TAvxExecutor() = default;
-    virtual void Execute(const void *src, void *dst, size_t noblocks) override;
+    ~TAvxExecutor() override = default;
+    void Execute(const void *src, void *dst, size_t noblocks) override;
 };
 
 struct TExecutorOpts {
-    double Probability_;
-    double Tolerance_;
+    double Probability_{};
+    double Tolerance_{};
     EInstructionSet Isa_ = EInstructionSet::Auto;
     bool UseJit_ = false;
 };
