@@ -33,3 +33,5 @@ if (USE_LLVM AND LLVM_FOUND)
 endif()
 
 add_subdirectory(fast-bernoulli)
+
+add_subdirectory(example)
