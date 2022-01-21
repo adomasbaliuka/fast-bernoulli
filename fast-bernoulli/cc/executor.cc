@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <memory>
 #include <x86intrin.h>
 
 #ifdef USE_JIT_EXECUTOR
@@ -137,10 +138,10 @@ TExecutorPtr CreateExecutor(const TExecutorOpts &opts) noexcept {
         switch (ise) {
         case EInstructionSet::Auto:
         case EInstructionSet::General:
-            ptr.reset(new TGeneralExecutor(std::move(*plan)));
+            ptr = std::make_unique<TGeneralExecutor>(*plan);
             break;
         case EInstructionSet::AVX:
-            ptr.reset(new TAvxExecutor(std::move(*plan)));
+            ptr = std::make_unique<TAvxExecutor>(*plan);
             break;
         case EInstructionSet::MMX: // Not implemented.
         case EInstructionSet::SSE: // Not implemented.

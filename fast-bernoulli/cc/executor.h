@@ -37,10 +37,10 @@ public:
         : Plan_{plan}
     {}
 
-    virtual ~IExecutor(void) = default;
+    virtual ~IExecutor() = default;
     virtual void Execute(const void *src, void *dst, size_t noblocks) = 0;
 
-    TExecutionPlan const &Plan(void) const noexcept {
+    TExecutionPlan const &Plan() const noexcept {
         return Plan_;
     }
 
@@ -54,7 +54,7 @@ public:
         : IExecutor(plan)
     {}
 
-    virtual ~TGeneralExecutor(void) = default;
+    virtual ~TGeneralExecutor() = default;
     virtual void Execute(const void *src, void *dst, size_t noblocks) override;
 };
 
@@ -64,7 +64,7 @@ public:
         : IExecutor(plan)
     {}
 
-    virtual ~TAvxExecutor(void) = default;
+    virtual ~TAvxExecutor() = default;
     virtual void Execute(const void *src, void *dst, size_t noblocks) override;
 };
 
