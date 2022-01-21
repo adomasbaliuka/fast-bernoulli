@@ -6,8 +6,8 @@
 
 namespace NFastBernoulli {
 
-bool IsAVXSupported(void) noexcept;
-bool IsMMXSupported(void) noexcept;
-bool IsSSESupported(void) noexcept;
+bool IsAVXSupported() noexcept;
+bool IsMMXSupported() noexcept;
+bool IsSSESupported() noexcept;
 
 } // namespace NFastBernoulli

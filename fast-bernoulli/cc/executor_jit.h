@@ -29,7 +29,7 @@ public:
         , JitState_{std::move(state)}
     {}
 
-    virtual ~TJitExecutor(void) = default;
+    virtual ~TJitExecutor() = default;
     virtual void Execute(const void *src, void *dst, size_t noblocks) override;
 
     static TExecutorPtr Create(const TExecutionPlan &plan,

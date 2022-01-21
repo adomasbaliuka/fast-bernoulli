@@ -22,35 +22,35 @@ using TRng = std::mt19937_64;
  */
 class TAlignedPtr {
 public:
-    TAlignedPtr(void) noexcept = default;
+    TAlignedPtr() noexcept = default;
     TAlignedPtr(void * ptr, size_t size) noexcept
         : Ptr_{ptr, &std::free}
         , Size_{size}
     {}
 
-    explicit operator bool(void) const noexcept {
+    explicit operator bool() const noexcept {
         return static_cast<bool>(Ptr_);
     }
 
-    void * Get(void) noexcept {
+    void * Get() noexcept {
         return Ptr_.get();
     }
 
-    void * const Get(void) const noexcept {
+    [[nodiscard]] void * const Get() const noexcept {
         return Ptr_.get();
     }
 
     template <typename T>
-    T * Get(void) noexcept {
+    T * Get() noexcept {
         return static_cast<T *>(Ptr_.get());
     }
 
     template <typename T>
-    T * const Get(void) const noexcept {
+    T * const Get() const noexcept {
         return static_cast<T * const>(Ptr_.get());
     }
 
-    size_t Size(void) const noexcept {
+    [[nodiscard]] size_t Size() const noexcept {
         return Size_;
     }
 
@@ -83,10 +83,10 @@ std::vector<T> Expand(const TAlignedPtr &ptr, size_t nobits = 256) {
  */
 class ISampler {
 public:
-    virtual ~ISampler(void) = default;
+    virtual ~ISampler() = default;
     virtual EStatus Sample(TRng &rng, void *begin, size_t size) noexcept = 0;
     virtual EStatus Sample(void *begin, size_t size) noexcept = 0;
-    virtual size_t GetBufferSize(size_t nobits = 256) const noexcept {
+    [[nodiscard]] virtual size_t GetBufferSize(size_t nobits = 256) const noexcept {
         if (size_t rem = nobits % 256; rem != 0) {
             nobits += 256 - rem;
         }
@@ -96,12 +96,13 @@ public:
 
 class TSamplerPtr {
 public:
-    TSamplerPtr(void) noexcept = default;
+    TSamplerPtr() noexcept = default;
+
     TSamplerPtr(std::unique_ptr<ISampler> &&sampler) noexcept
         : Sampler_{std::move(sampler)}
     {}
 
-    explicit inline operator bool(void) const noexcept {
+    explicit inline operator bool() const noexcept {
         return static_cast<bool>(Sampler_);
     }
 
@@ -117,15 +118,15 @@ public:
         return Sampler_->Sample(ptr, size);
     }
 
-    inline size_t GetBufferSize(size_t nobits) const noexcept {
+    [[nodiscard]] inline size_t GetBufferSize(size_t nobits) const noexcept {
         return Sampler_->GetBufferSize(nobits);
     }
 
-    inline ISampler *Get(void) noexcept {
+    inline ISampler *Get() noexcept {
         return Sampler_.get();
     }
 
-    inline TAlignedPtr MakeBuffer(size_t nobits) const noexcept {
+    [[nodiscard]] inline TAlignedPtr MakeBuffer(size_t nobits) const noexcept {
         return std::move(MakeAligned(GetBufferSize(nobits)));
     }
 
@@ -134,8 +135,8 @@ private:
 };
 
 struct TSamplerOpts {
-    double Probability_;
-    double Tolerance_;
+    double Probability_{};
+    double Tolerance_{};
     EInstructionSet Ise_ = EInstructionSet::Auto;
     bool UseJit_ = false;
     bool UseStdSampler_ = false;

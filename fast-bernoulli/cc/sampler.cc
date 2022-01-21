@@ -7,6 +7,8 @@
 
 #include <x86intrin.h>
 
+#include <memory>
+
 namespace NFastBernoulli {
 
 TAlignedPtr MakeAligned(size_t bytes) noexcept {
@@ -43,8 +45,8 @@ public:
         : Dist_{proba}
     {}
 
-    virtual EStatus Sample(TRng &rng, void *begin, size_t size) noexcept override;
-    virtual EStatus Sample(void *begin, size_t size) noexcept override;
+    EStatus Sample(TRng &rng, void *begin, size_t size) noexcept override;
+    EStatus Sample(void *begin, size_t size) noexcept override;
 
 private:
     std::bernoulli_distribution Dist_;
@@ -81,17 +83,17 @@ public:
         : Executor_{std::move(executor)}
     {}
 
-    virtual size_t GetBufferSize(size_t nobits) const noexcept override;
-    size_t GetBlockSize(void) const noexcept;
+    [[nodiscard]] size_t GetBufferSize(size_t nobits) const noexcept override;
+    [[nodiscard]] static size_t GetBlockSize() noexcept;
 
-    virtual EStatus Sample(TRng &rng, void *ptr, size_t size) noexcept override;
-    virtual EStatus Sample(void *ptr, size_t size) noexcept override;
+    EStatus Sample(TRng &rng, void *ptr, size_t size) noexcept override;
+    EStatus Sample(void *ptr, size_t size) noexcept override;
 
 private:
     TExecutorPtr Executor_;
 };
 
-size_t TBaseSampler::GetBlockSize(void) const noexcept {
+size_t TBaseSampler::GetBlockSize() noexcept {
     return 32;
 }
 
@@ -125,7 +127,7 @@ EStatus TBaseSampler::Sample(void *ptr, size_t size) noexcept {
 TSamplerPtr CreateSampler(const TSamplerOpts &opts) {
     if (opts.UseStdSampler_) {
         std::unique_ptr<ISampler> ptr;
-        ptr.reset(new TStdSampler(opts.Probability_));
+        ptr = std::make_unique<TStdSampler>(opts.Probability_);
         return ptr;
     }
 
@@ -140,12 +142,13 @@ TSamplerPtr CreateSampler(const TSamplerOpts &opts) {
         return {};
     } else {
         std::unique_ptr<ISampler> ptr;
-        ptr.reset(new TBaseSampler(std::move(executor)));
+        ptr = std::make_unique<TBaseSampler>(std::move(executor));
         return std::move(ptr);
     }
 }
 
 TSamplerPtr CreateSampler(double prob, double tol) {
+    // AB: note, this `.field=val` notation is a C++20 feature?!
     auto sampler = CreateSampler({.Probability_ = prob, .Tolerance_ = tol});
     return std::move(sampler);
 }
