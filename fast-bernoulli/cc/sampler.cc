@@ -21,7 +21,7 @@ std::vector<bool> Expand(const TAlignedPtr &ptr, size_t nobits) {
 
 inline EStatus Validate(void *ptr, size_t size) {
     //  Pointer is not properly aligned.
-    if (reinterpret_cast<size_t>(ptr) & 0b1111) {
+    if (reinterpret_cast<uintptr_t>(ptr) & 0b1111) {
         return EWrongPtrAlignment;
     }
 
